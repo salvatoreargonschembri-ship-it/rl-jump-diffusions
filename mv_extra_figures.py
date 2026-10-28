@@ -4,9 +4,11 @@ mv_extra_figures.py — Additional figures for Chapter 7
 Produce quattro figure supplementari per approfondire l'analisi
 del Capitolo 7 della tesi (multi-asset mean-variance).
 
-PREREQUISITE: run mv_multiasset.py before this script.
-The learned phi1 is read from mv_multiasset_results.npz (if present)
-or falls back to the hardcoded value from the last known run.
+PREREQUISITE: run mv_multiasset_corr.py before this script.
+The learned phi1 is read from mv_multiasset_results.npz (required).
+The MJD calibration is identical to the one in mv_multiasset_corr.py
+(per-asset MLE, L-BFGS-B, maxiter=300, ftol=1e-8); no ad hoc
+replacement of the estimated diffusive volatility is applied.
 
 Figures produced:
   figure_ma_corr.pdf/png              — empirical correlation heatmap
@@ -39,7 +41,7 @@ mpl.rcParams.update({
 })
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 1.  PARAMETRI  (identici a mv_multiasset.py)
+# 1.  PARAMETRI  (identici a mv_multiasset_corr.py)
 # ─────────────────────────────────────────────────────────────────────────────
 
 TICKERS      = ['^GSPC', 'AGG', 'VGK', 'GLD', 'QQQ']
@@ -54,7 +56,7 @@ Z            = 1.4
 X0           = 1.0
 TRAIN_END    = '2019-12-31'
 TEST_END     = '2023-12-31'
-ETA_DEFAULT  = 0.10          # same as mv_multiasset.py (eq. 7.15)
+ETA_DEFAULT  = 0.10          # same as mv_multiasset_corr.py (eq. 7.15)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -65,24 +67,17 @@ RESULTS_FILE = 'mv_multiasset_results.npz'
 
 def load_learned_phi1():
     """
-    Reads the learned phi1 from mv_multiasset_results.npz if it exists,
-    otherwise uses the last known value from a manual run.
-    To save results from mv_multiasset.py, add at the end of its main block:
-        np.savez('mv_multiasset_results.npz',
-                 phi1_learned=model.phi1,
-                 phi1_bs=PHI1_BS, phi1_mjd=PHI1_MJD)
+    Reads the learned phi1 saved by mv_multiasset_corr.py in
+    mv_multiasset_results.npz. The file is required: run
+    mv_multiasset_corr.py first.
     """
-    if os.path.exists(RESULTS_FILE):
-        data = np.load(RESULTS_FILE)
-        phi1 = data['phi1_learned']
-        print(f"  Loaded phi1_learned from {RESULTS_FILE}: {np.round(phi1, 3)}")
-        return phi1
-    else:
-        phi1 = np.array([0.800, 1.603, 1.177, 0.657, 0.588])
-        print(f"  [Warning] {RESULTS_FILE} not found. Using last known value.")
-        print(f"  Run mv_multiasset.py first for accurate results.")
-        print(f"  Fallback phi1_learned = {np.round(phi1, 3)}")
-        return phi1
+    if not os.path.exists(RESULTS_FILE):
+        raise FileNotFoundError(
+            f"{RESULTS_FILE} not found. Run mv_multiasset_corr.py first.")
+    data = np.load(RESULTS_FILE)
+    phi1 = data['phi1_learned']
+    print(f"  Loaded phi1_learned from {RESULTS_FILE}: {np.round(phi1, 3)}")
+    return phi1
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -162,10 +157,6 @@ def calibrate_mjd(ret_monthly):
             mu_i,sig_i,lam_i,m_i,delta_i = res.x
         except Exception:
             mu_i,sig_i,lam_i,m_i,delta_i = mu_vec[i],sig0,5.,-0.01,0.03
-        # Fallback: 30% threshold (consistent with mv_multiasset.py)
-        sig_bs_i = np.std(ret_monthly[:,i])/np.sqrt(DT)
-        if sig_i < 0.30*sig_bs_i:
-            sig_i = sig_bs_i
         sigma_diff[i] = sig_i
         sigmaJ_sq[i]  = lam_i*(np.exp(2*m_i+2*delta_i**2)
                                 -2*np.exp(m_i+0.5*delta_i**2)+1)
@@ -384,7 +375,3 @@ if __name__ == '__main__':
               'figure_ma_alloc_oos', 'figure_ma_benchmark_compare']:
         print(f"    {f}.pdf/png")
     print("="*55)
-    print("\n  Tip: add to mv_multiasset.py main block:")
-    print("    np.savez('mv_multiasset_results.npz',")
-    print("             phi1_learned=model.phi1,")
-    print("             phi1_bs=PHI1_BS, phi1_mjd=PHI1_MJD)")
