@@ -4,7 +4,7 @@ mv_multiasset_cara.py — Multi-Asset CARA Portfolio Selection
 Variante CARA (Constant Absolute Risk Aversion) del Capitolo 7.
 Usa CARAModelMulti invece di MVModelMulti.
 
-Differenza rispetto a mv_multiasset.py (MV):
+Differenza rispetto a mv_multiasset_corr.py (MV):
   - Value function: J(t,x) = -exp(-alpha*x * f(t))
   - Policy ottimale: COSTANTE a* = (1/alpha)*Sigma_eff^{-1}*rho
     (non dipende da x, al contrario della MV)
@@ -75,7 +75,7 @@ TEST_END   = '2023-12-31'
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2.  DOWNLOAD E PREPROCESSING  (identical to mv_multiasset.py)
+# 2.  DOWNLOAD E PREPROCESSING  (identical to mv_multiasset_corr.py)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def load_multiasset(tickers=TICKERS, train_end=TRAIN_END, test_end=TEST_END):
@@ -123,7 +123,7 @@ def load_multiasset(tickers=TICKERS, train_end=TRAIN_END, test_end=TEST_END):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 3.  CALIBRAZIONE  (identical to mv_multiasset.py)
+# 3.  CALIBRAZIONE  (identical to mv_multiasset_corr.py)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def calibrate_bs_multi(ret_monthly, r_f=R_F):
