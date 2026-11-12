@@ -10,7 +10,7 @@ Struttura:
 
 Confronto nel periodo di test:
   - Policy RL appresa
-  - Buy-and-hold (investimento fisso proporzionale a x_0)
+  - Fixed allocation (investimento fisso proporzionale a x_0)
   - Benchmark analitico phi_1* calcolato sui dati di training
 
 Output:
@@ -356,7 +356,7 @@ def evaluate_test(model, ret_test, dates_test, phi1_bs, phi1_mjd):
     """
     Applica la policy appresa ai rendimenti mensili reali del periodo di test.
     Confronta con:
-      - Buy-and-hold: investe sempre la stessa frazione fissa (phi1_bs * (X0-omega))
+      - Fixed allocation: investe sempre la stessa frazione fissa (phi1_bs * (X0-omega))
       - Benchmark analitico: usa phi1* calcolato sui dati di training
     """
     n_test    = len(ret_test)
@@ -365,7 +365,7 @@ def evaluate_test(model, ret_test, dates_test, phi1_bs, phi1_mjd):
     wealth_bs  = np.zeros(n_test + 1); wealth_bs[0]  = X0
     wealth_mjd = np.zeros(n_test + 1); wealth_mjd[0] = X0
 
-    # Buy-and-hold: investe una quota fissa = (Z - X0) ogni mese
+    # Fixed allocation: investe una quota fissa = (Z - X0) ogni mese
     a_bh = Z - X0   # ~0.4
 
     for k, r in enumerate(ret_test):
@@ -376,7 +376,7 @@ def evaluate_test(model, ret_test, dates_test, phi1_bs, phi1_mjd):
         a_rl = model.mean_action(t, wealth_rl[k])
         wealth_rl[k+1] = wealth_rl[k] + a_rl * ret
 
-        # Buy-and-hold
+        # Fixed allocation
         wealth_bh[k+1] = wealth_bh[k] + a_bh * ret
 
         # Benchmark BS
@@ -432,7 +432,7 @@ if __name__ == '__main__':
 
     print(f"\n  Ricchezza finale (2020-2023):")
     print(f"    Policy RL:         {wealth_rl[-1]:.4f}")
-    print(f"    Buy-and-hold:      {wealth_bh[-1]:.4f}")
+    print(f"    Fixed alloc.:      {wealth_bh[-1]:.4f}")
     print(f"    Benchmark BS:      {wealth_bs[-1]:.4f}")
     print(f"    Benchmark MJD:     {wealth_mjd[-1]:.4f}")
 
@@ -466,7 +466,7 @@ if __name__ == '__main__':
 
     entries = [
         (wealth_rl,  'steelblue',   '-',  'Policy RL'),
-        (wealth_bh,  'gray',        ':',  'Buy-and-hold'),
+        (wealth_bh,  'gray',        ':',  'Fixed allocation'),
         (wealth_bs,  'darkorange',  '--', fr'Benchmark BS ($\phi_1^*$={PHI1_BS:.3f})'),
         (wealth_mjd, 'forestgreen', '-.', fr'Benchmark MJD ($\phi_1^*$={PHI1_MJD:.3f})'),
     ]
@@ -498,7 +498,7 @@ if __name__ == '__main__':
 
     for cum, col, ls, lbl in [
         (cum_rl,  'steelblue',  '-',  'Policy RL'),
-        (cum_bh,  'gray',       ':',  'Buy-and-hold'),
+        (cum_bh,  'gray',       ':',  'Fixed allocation'),
         (cum_bs,  'darkorange', '--', 'Benchmark BS'),
         (cum_mjd, 'forestgreen','-.', 'Benchmark MJD'),
     ]:
@@ -535,7 +535,7 @@ if __name__ == '__main__':
     print(f"  {'-'*64}")
     for label, w_arr in [
         ('Policy RL',          wealth_rl),
-        ('Buy-and-hold',       wealth_bh),
+        ('Fixed alloc.',       wealth_bh),
         (f'Benchmark BS',      wealth_bs),
         (f'Benchmark MJD',     wealth_mjd),
     ]:
