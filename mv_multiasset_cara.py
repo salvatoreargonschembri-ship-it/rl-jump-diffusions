@@ -53,7 +53,7 @@ DT          = 1 / 12
 T           = 1.0
 K           = 12
 THETA       = 0.1
-Z           = 1.4        # kept for buy-and-hold reference only
+Z           = 1.4        # kept for fixed-allocation reference only
 X0          = 1.0
 ALPHA_CARA  = 1.0        # CARA risk aversion parameter
 
@@ -411,7 +411,7 @@ if __name__ == '__main__':
     print(f"  {'Strategy':<25} {'X_T':>7} {'Ret%':>7} {'Vol%':>7} {'Sharpe':>8} {'MaxDD':>8}")
     print(f"  {'-'*60}")
     for lbl, w in [('RL CARA',      W_rl),
-                   ('Buy-and-hold', W_bh),
+                   ('Fixed alloc.', W_bh),
                    ('Benchmark BS', W_bs),
                    ('Benchmark MJD',W_mjd)]:
         xt, ar, av, sh, dd = stats(w)
@@ -495,7 +495,7 @@ if __name__ == '__main__':
     print(f"  {'Strategy':<25} {'X_T':>7} {'Ret%':>7} {'Vol%':>7} {'Sharpe':>8} {'MaxDD':>8}")
     print(f"  {'-'*60}")
     for lbl, w in [('RL correlated', W_rl_c),
-                   ('Buy-and-hold',  W_bh_c),
+                   ('Fixed alloc.',  W_bh_c),
                    ('Benchmark BS',  W_bs_c),
                    ('Benchmark corr',W_corr)]:
         xt, ar, av, sh, dd = stats(w)
@@ -536,7 +536,7 @@ if __name__ == '__main__':
     for w, col, ls, lbl in [
         (W_rl,   'steelblue',  '-',  'RL CARA-EXP2'),
         (W_rl_c, 'darkorange', '--', 'RL CARA-EXP1'),
-        (W_bh,   'gray',       ':',  'Buy-and-hold'),
+        (W_bh,   'gray',       ':',  'Fixed allocation'),
         (W_bs,   'forestgreen','-.', 'Benchmark BS'),
     ]:
         ax.plot(test_dates_p, util(w), color=col, lw=2., ls=ls, label=lbl)
@@ -555,7 +555,7 @@ if __name__ == '__main__':
                           ['steelblue','darkorange','forestgreen','gray']):
         patch.set_facecolor(col); patch.set_alpha(0.6)
     ax.set_xticks([1,2,3,4])
-    ax.set_xticklabels(['RL\nEXP2','RL\nEXP1','BM\nBS','B&H'], fontsize=9)
+    ax.set_xticklabels(['RL\nEXP2','RL\nEXP1','BM\nBS','Fixed'], fontsize=9)
     ax.set_ylabel(r'$-e^{-X_T}$'); ax.set_title('Utility distribution OOS')
     ax.grid(True, alpha=0.3)
 
