@@ -462,7 +462,7 @@ def offline_training_multi(sim, psi3_init, phi1_star_vec):
 def evaluate_oos_multi(model, ret_test, phi1_bs, phi1_mjd):
     """
     Applica la policy appresa ai rendimenti reali del test set.
-    Confronta con benchmark BS e MJD analitici e buy-and-hold.
+    Confronta con benchmark BS e MJD analitici e fixed allocation.
     """
     n_test = len(ret_test)
     wealth_rl  = np.zeros(n_test+1); wealth_rl[0]  = X0
@@ -470,7 +470,7 @@ def evaluate_oos_multi(model, ret_test, phi1_bs, phi1_mjd):
     wealth_bs  = np.zeros(n_test+1); wealth_bs[0]  = X0
     wealth_mjd = np.zeros(n_test+1); wealth_mjd[0] = X0
 
-    # Buy-and-hold: alloca (Z-X0)/D in ogni asset
+    # Fixed allocation: alloca (Z-X0)/D in ogni asset
     a_bh = np.ones(D) * (Z - X0) / D
 
     omega = model.omega
@@ -483,7 +483,7 @@ def evaluate_oos_multi(model, ret_test, phi1_bs, phi1_mjd):
         a_rl = model.mean_action(t, wealth_rl[k])
         wealth_rl[k+1] = wealth_rl[k] + np.dot(a_rl, r_excess)
 
-        # Buy-and-hold
+        # Fixed allocation
         wealth_bh[k+1] = wealth_bh[k] + np.dot(a_bh, r_excess)
 
         # Benchmark BS
@@ -590,7 +590,7 @@ if __name__ == '__main__':
     fig, ax = plt.subplots(figsize=(11, 5))
     entries = [
         (wealth_rl,  'steelblue',   '-',  'Policy RL'),
-        (wealth_bh,  'gray',        ':',  'Buy-and-hold'),
+        (wealth_bh,  'gray',        ':',  'Fixed allocation'),
         (wealth_bs,  'darkorange',  '--', 'Benchmark BS'),
         (wealth_mjd, 'forestgreen', '-.', 'Benchmark MJD'),
     ]
@@ -622,7 +622,7 @@ if __name__ == '__main__':
     print(f"  {'-'*60}")
     for label, w_arr in [
         ('Policy RL',      wealth_rl),
-        ('Buy-and-hold',   wealth_bh),
+        ('Fixed alloc.',   wealth_bh),
         ('Benchmark BS',   wealth_bs),
         ('Benchmark MJD',  wealth_mjd),
     ]:
@@ -756,7 +756,7 @@ if __name__ == '__main__':
     print(f"  {'-'*60}")
     for label, w_arr in [
         ('RL correlated',        wealth_rl_c),
-        ('Buy-and-hold',          wealth_bh_c),
+        ('Fixed alloc.',          wealth_bh_c),
         ('Benchmark BS',          wealth_bs_c),
         ('Benchmark correlated',  wealth_corr_c),
     ]:
@@ -793,7 +793,7 @@ if __name__ == '__main__':
     fig, ax = plt.subplots(figsize=(11, 5))
     for w_arr, col, ls, lbl in [
         (wealth_rl_c,   'steelblue',   '-',  'RL correlated'),
-        (wealth_bh_c,   'gray',        ':',  'Buy-and-hold'),
+        (wealth_bh_c,   'gray',        ':',  'Fixed allocation'),
         (wealth_bs_c,   'darkorange',  '--', 'Benchmark BS'),
         (wealth_corr_c, 'forestgreen', '--', 'Benchmark correlated'),
     ]:
@@ -1240,7 +1240,7 @@ if __name__ == '__main__':
     for W_arr, col, ls, lbl in [
         (np.median(W_tc, axis=0), 'steelblue',  '-',  'RL with TC (c=0.001)'),
         (wealth_rl,               'darkorange',  '--', 'No-TC (EXP2)'),
-        (wealth_bh,               'gray',        ':',  'Buy-and-hold'),
+        (wealth_bh,               'gray',        ':',  'Fixed allocation'),
     ]:
         ax.plot(test_dates_tc[:len(W_arr)], W_arr, color=col, lw=2.0,
                 ls=ls, label=lbl)
