@@ -466,8 +466,8 @@ def oos_eval(model, monthly_test, c_tc):
                 sharpe=sharpe, maxdd=maxdd, turnover=to_mean, wealth=wealth)
 
 
-def oos_buyhold(monthly_test, a_fixed=None, c_tc=0.):
-    """Buy-and-hold with equal allocation and TC."""
+def oos_fixed_alloc(monthly_test, a_fixed=None, c_tc=0.):
+    """Fixed allocation with equal allocation and TC."""
     if a_fixed is None:
         a_fixed = np.full(D, 0.4/D)
     x = X0; wealth = [x]; port_ret = []; turnover = []
@@ -558,8 +558,8 @@ if __name__ == '__main__':
           f"{'Vol%':>7} {'Sharpe':>7} {'MaxDD':>8} {'Turnover':>9}")
     print("  " + "-"*73)
 
-    bh = oos_buyhold(monthly_test, c_tc=0.)
-    print(f"  {'B&H':>6} {'--':>8} {bh['XT']:>6.3f} "
+    bh = oos_fixed_alloc(monthly_test, c_tc=0.)
+    print(f"  {'Fixed':>6} {'--':>8} {bh['XT']:>6.3f} "
           f"{bh['ann_ret']*100:>7.2f} {bh['ann_vol']*100:>7.2f} "
           f"{bh['sharpe']:>7.3f} {bh['maxdd']*100:>7.2f}% "
           f"{bh['turnover']:>9.3f}")
@@ -621,7 +621,7 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.plot(months, bh['wealth'], color='gray', lw=1.5, ls=':',
-            label='Buy-and-hold')
+            label='Fixed allocation')
     for i, c_tc in enumerate(TC_LEVELS):
         s = oos_results[c_tc]
         ax.plot(months, s['wealth'], color=COLORS[i], lw=2.0,
